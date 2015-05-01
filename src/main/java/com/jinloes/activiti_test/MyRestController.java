@@ -2,8 +2,12 @@ package com.jinloes.activiti_test;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
+import javax.websocket.server.PathParam;
+
+import org.activiti.engine.history.HistoricActivityInstance;
 import org.activiti.engine.task.Task;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -37,6 +41,13 @@ public class MyRestController {
         }
         return dtos;
     }
+
+    @RequestMapping(value = "/users/{userId}/processes")
+    public Map<String, List<HistoricActivityInstance>> getProcesses(@PathParam("userId") String userId,
+            @RequestParam("process_id") String processId) {
+        return myService.getProcceses(userId, processId);
+    }
+
 
     static class TaskRepresentation {
 

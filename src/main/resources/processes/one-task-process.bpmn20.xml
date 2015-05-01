@@ -1,14 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
-        xmlns:activiti="http://activiti.org/bpmn"
-        targetNamespace="Examples">
+             xmlns:activiti="http://activiti.org/bpmn"
+             targetNamespace="Examples">
 
     <process id="oneTaskProcess" name="The One Task Process">
-        <startEvent id="theStart" />
-        <sequenceFlow id="flow1" sourceRef="theStart" targetRef="theTask" />
-        <userTask id="theTask" name="my task" activiti:assignee="${person.id}"/>
-        <sequenceFlow id="flow2" sourceRef="theTask" targetRef="theEnd" />
-        <endEvent id="theEnd" />
+        <startEvent id="theStart" name="The start of the process" activiti:initiator="initiator"/>
+        <sequenceFlow id="flow1" sourceRef="theStart" targetRef="serviceTask"/>
+
+        <!-- This task is created for a specific user and will not complete until the user does so -->
+        <!--<userTask id="theTask" name="my task" activiti:assignee="${person.id}"/>
+        <sequenceFlow sourceRef="theStart" targetRef="serviceTask"/>-->
+
+        <serviceTask id="serviceTask" name="My Bean Test" activiti:expression="#{myBean.execute()}"/>
+        <sequenceFlow id="scriptFlow" sourceRef="serviceTask" targetRef="scriptTask"/>
+
+        <scriptTask id="scriptTask" name="Script Task" scriptFormat="groovy">
+            <script>out:println "This is my script task. Printing variable " + var1;</script>
+        </scriptTask>
+        <sequenceFlow id="flow2" sourceRef="scriptTask" targetRef="theEnd"/>
+
+        <endEvent id="theEnd" name="The end of the process"/>
     </process>
 
 </definitions>
