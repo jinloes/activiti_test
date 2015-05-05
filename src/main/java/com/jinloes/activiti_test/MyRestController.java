@@ -7,6 +7,9 @@ import java.util.UUID;
 
 import javax.websocket.server.PathParam;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import org.activiti.engine.history.HistoricActivityInstance;
 import org.activiti.engine.task.Task;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +31,39 @@ public class MyRestController {
 
     @RequestMapping(value = "/process", method = RequestMethod.POST)
     public void startProcessInstance(@RequestBody StartProcessRepresentation representation) {
-        myService.startProcess(representation.getAssignee());
+        myService.startProcess(representation.getAssignee(),
+                representation.getMigrationTargetType());
+    }
+
+    @RequestMapping(value = "/os_process", method = RequestMethod.POST)
+    public void startMigration(@RequestBody StartProcessRepresentation representation,
+            @RequestParam("os_type") String osType) {
+        myService.startOsProcess(representation.getAssignee(), osType);
+    }
+
+    @RequestMapping(value = "/preflight", method = RequestMethod.POST)
+    public void startPreflight(@RequestBody StartRequest request) {
+        myService.startPreflight(request);
+    }
+
+    public static class StartRequest {
+        private final boolean warnUser;
+        private String assignUser;
+
+        @JsonCreator
+        public StartRequest(@JsonProperty("warnUser") boolean warnUser,
+                @JsonProperty("assignUser") String assignUser) {
+            this.warnUser = warnUser;
+            this.assignUser = assignUser;
+        }
+
+        public boolean isWarnUser() {
+            return warnUser;
+        }
+
+        public String getAssignUser() {
+            return assignUser;
+        }
     }
 
     @RequestMapping(value = "/tasks", method = RequestMethod.GET,
@@ -80,13 +115,24 @@ public class MyRestController {
     static class StartProcessRepresentation {
 
         private UUID assignee;
+        private String migrationTargetType;
 
         public UUID getAssignee() {
             return assignee;
         }
 
+        @JsonProperty("assignee")
         public void setAssignee(UUID assignee) {
             this.assignee = assignee;
+        }
+
+        public String getMigrationTargetType() {
+            return migrationTargetType;
+        }
+
+        @JsonProperty("migrationTargetType")
+        public void setMigrationTargetType(String migrationTargetType) {
+            this.migrationTargetType = migrationTargetType;
         }
     }
 

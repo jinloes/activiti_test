@@ -1,5 +1,6 @@
 package com.jinloes.activiti_test;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -42,12 +43,14 @@ public class MyTaskService {
     private PersonRepository personRepository;
 
     @Transactional
-    public void startProcess(UUID assignee) {
+    public void startProcess(UUID assignee, String migrationTargetType) {
         Person person = personRepository.getOne(assignee);
         Map<String, Object> variables = new HashMap<>();
         variables.put("person", person);
         variables.put("var1", "test");
         variables.put("name", RandomStringUtils.randomAlphanumeric(6));
+        variables.put("migration_document", new MigrationDocument(
+                RandomStringUtils.randomAlphanumeric(6), migrationTargetType));
         identityService.setAuthenticatedUserId(Application.person.getId().toString());
         runtimeService.startProcessInstanceByKey("oneTaskProcess", variables);
     }
@@ -87,5 +90,43 @@ public class MyTaskService {
             response.put(MapUtils.getString(variables, "name"), activityInstances);
         }
         return response;
+    }
+
+    public void startPreflight(MyRestController.StartRequest request) {
+        //Person person = personRepository.getOne(UUID.fromString(request.getAssignUser()));
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("name", RandomStringUtils.randomAlphanumeric(6));
+        identityService.setAuthenticatedUserId(Application.person.getId().toString());
+        runtimeService.startProcessInstanceByKey("preflightProcess2", variables);
+    }
+
+    public void startOsProcess(UUID assignee, String osType) {
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("name", RandomStringUtils.randomAlphanumeric(6));
+        Map<String, Object> document = new HashMap<>();
+        document.put("osType", osType);
+        variables.put("document", document);
+        identityService.setAuthenticatedUserId(Application.person.getId().toString());
+        runtimeService.startProcessInstanceByKey("migrationFlow", variables);
+    }
+
+    public static class MigrationDocument implements Serializable {
+        private static final long serialVersionUID = -786519957903736106L;
+
+        private final String name;
+        private final String type;
+
+        public MigrationDocument(String name, String type) {
+            this.name = name;
+            this.type = type;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public String getType() {
+            return type;
+        }
     }
 }

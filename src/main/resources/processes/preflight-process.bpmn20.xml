@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:activiti="http://activiti.org/bpmn"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             targetNamespace="Examples">
+
+    <process id="preflightProcess2" name="Runs a preflight">
+        <startEvent id="preflightStart" name="Preflight start process" activiti:initiator="initiator"/>
+        <sequenceFlow id="flow1" sourceRef="preflightStart" targetRef="loginCheck"/>
+
+        <serviceTask id="loginCheck" name="Login check" activiti:expression="#{loginCheck.execute()}"/>
+        <sequenceFlow id="scriptFlow" sourceRef="loginCheck" targetRef="loginFailedGateway"/>
+
+        <exclusiveGateway id="loginFailedGateway"/>
+        <sequenceFlow sourceRef="loginFailedGateway" targetRef="loginUserInput">
+            <conditionExpression xsi:type="tFormalExpression">
+                ${loginFailed == true and sslFailed == true}
+            </conditionExpression>
+        </sequenceFlow>
+
+        <userTask id="loginUserInput" name="SSL Failed" activiti:assignee="${person.id}"/>
+
+        <sequenceFlow sourceRef="loginFailedGateway" targetRef="preflightEnd"/>
+
+        <endEvent id="preflightEnd" name="End of the preflight process"/>
+    </process>
+
+</definitions>

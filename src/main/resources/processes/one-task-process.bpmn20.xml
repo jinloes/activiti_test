@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
              xmlns:activiti="http://activiti.org/bpmn"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
              targetNamespace="Examples">
 
     <process id="oneTaskProcess" name="The One Task Process">
@@ -11,9 +12,24 @@
         <!--<userTask id="theTask" name="my task" activiti:assignee="${person.id}"/>
         <sequenceFlow sourceRef="theStart" targetRef="serviceTask"/>-->
 
-        <serviceTask id="serviceTask" name="My Bean Test" activiti:expression="#{myBean.execute()}"/>
-        <sequenceFlow id="scriptFlow" sourceRef="serviceTask" targetRef="scriptTask"/>
+        <serviceTask id="serviceTask" name="My Bean Test" activiti:expression="#{myBean.execute(execution)}"/>
+        <sequenceFlow id="scriptFlow" sourceRef="serviceTask" targetRef="specificTypeGateway"/>
 
+        <exclusiveGateway id="specificTypeGateway"/>
+        <!-- VCloud flow -->
+        <sequenceFlow sourceRef="specificTypeGateway" targetRef="vcloudScript">
+            <conditionExpression xsi:type="tFormalExpression">
+                ${migration_document.type == "vcloud"}
+            </conditionExpression>
+        </sequenceFlow>
+        <scriptTask id="vcloudScript" name = "VCloud Script" scriptFormat="groovy">
+            <script>out:println "This is a vcloud script"</script>
+        </scriptTask>
+        <sequenceFlow sourceRef="vcloudScript" targetRef="scriptTask"/>
+        <!-- Default flow -->
+        <sequenceFlow sourceRef="specificTypeGateway" targetRef="scriptTask"/>
+
+        <!-- Split flow converges back -->
         <scriptTask id="scriptTask" name="Script Task" scriptFormat="groovy">
             <script>out:println "This is my script task. Printing variable " + var1;</script>
         </scriptTask>

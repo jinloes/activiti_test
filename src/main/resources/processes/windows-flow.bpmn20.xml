@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:activiti="http://activiti.org/bpmn"
+             targetNamespace="Examples">
+
+    <process id="windowsFlow" name="Runs a windows process">
+        <startEvent id="windowsStart" name="Start windows process"
+                    activiti:initiator="initiator"/>
+        <sequenceFlow id="flow1" sourceRef="windowsStart" targetRef="step1"/>
+
+        <scriptTask id="step1" name="Step 1" scriptFormat="groovy">
+            <script>out:println "Windows Process Step 1 Running"</script>
+        </scriptTask>
+        <sequenceFlow id="flow2" sourceRef="step1" targetRef="step2"/>
+
+        <scriptTask id="step2" name="Step 2" scriptFormat="groovy">
+            <script>out:println "Windows Process Step 2 Running"</script>
+        </scriptTask>
+        <sequenceFlow id="flow3" sourceRef="step2" targetRef="migrationEnd"/>
+
+        <endEvent id="migrationEnd" name="End of the os process"/>
+    </process>
+
+</definitions>

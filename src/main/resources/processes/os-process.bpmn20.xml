@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:activiti="http://activiti.org/bpmn"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             targetNamespace="Examples">
+
+    <process id="migrationFlow" name="Runs a full os process flow">
+        <startEvent id="processStart" name="Start os process flow" activiti:initiator="initiator"/>
+        <sequenceFlow id="flow1" sourceRef="processStart" targetRef="beforeOsProcessComponent"/>
+
+        <scriptTask id="beforeOsProcessComponent" name="Before Migration component"
+                    scriptFormat="groovy">
+            <script>out:println "Before Migration component"</script>
+        </scriptTask>
+        <sequenceFlow id="flow2" sourceRef="beforeOsProcessComponent"
+                      targetRef="startOsProcessGateway"/>
+
+        <exclusiveGateway id="startOsProcessGateway"/>
+        <sequenceFlow sourceRef="startOsProcessGateway" targetRef="startWindowsProcess">
+            <conditionExpression xsi:type="tFormalExpression">
+                ${document.osType == 'windows'}
+            </conditionExpression>
+        </sequenceFlow>
+
+        <callActivity id="startWindowsProcess" calledElement="windowsFlow">
+        </callActivity>
+        <sequenceFlow sourceRef="startWindowsProcess" targetRef="afterOsProcessComponent"/>
+
+        <sequenceFlow sourceRef="startOsProcessGateway" targetRef="startLinuxProcess">
+            <conditionExpression xsi:type="tFormalExpression">
+                ${document.osType == 'linux'}
+            </conditionExpression>
+        </sequenceFlow>
+
+        <callActivity id="startLinuxProcess" calledElement="linuxFlow">
+        </callActivity>
+        <sequenceFlow sourceRef="startLinuxProcess" targetRef="afterOsProcessComponent"/>
+
+        <scriptTask id="afterOsProcessComponent" name="After migration component"
+                    scriptFormat="groovy">
+            <script>out:println "After migration component"</script>
+        </scriptTask>
+        <sequenceFlow sourceRef="afterOsProcessComponent" targetRef="migrationEnd"/>
+
+        <endEvent id="migrationEnd" name="End of the migration process"/>
+    </process>
+
+</definitions>

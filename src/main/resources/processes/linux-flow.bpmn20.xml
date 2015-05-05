@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:activiti="http://activiti.org/bpmn"
+             targetNamespace="Examples">
+
+    <process id="linuxFlow" name="Runs a linux process">
+        <startEvent id="linuxStart" name="Start linux process"
+                    activiti:initiator="initiator"/>
+        <sequenceFlow id="flow1" sourceRef="linuxStart" targetRef="step1"/>
+
+        <scriptTask id="step1" name="Step 1" scriptFormat="groovy">
+            <script>out:println "Linux Flow Step 1 Running"</script>
+        </scriptTask>
+        <sequenceFlow id="flow2" sourceRef="step1" targetRef="step2"/>
+
+        <scriptTask id="step2" name="Step 2" scriptFormat="groovy">
+            <script>out:println "Linux Flow Step 2 Running"</script>
+        </scriptTask>
+        <sequenceFlow id="flow3" sourceRef="step2" targetRef="linuxEnd"/>
+
+        <endEvent id="linuxEnd" name="End of the linux process"/>
+    </process>
+
+</definitions>
