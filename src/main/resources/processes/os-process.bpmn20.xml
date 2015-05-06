@@ -8,10 +8,8 @@
         <startEvent id="processStart" name="Start os process flow" activiti:initiator="initiator"/>
         <sequenceFlow id="flow1" sourceRef="processStart" targetRef="beforeOsProcessComponent"/>
 
-        <scriptTask id="beforeOsProcessComponent" name="Before Migration component"
-                    scriptFormat="groovy">
-            <script>out:println "Before Migration component"</script>
-        </scriptTask>
+        <serviceTask id="beforeOsProcessComponent" name="Before Migration component"
+                     activiti:expression="#{beforeProcess.execute(execution)}"/>
         <sequenceFlow id="flow2" sourceRef="beforeOsProcessComponent"
                       targetRef="startOsProcessGateway"/>
 
@@ -36,10 +34,8 @@
         </callActivity>
         <sequenceFlow sourceRef="startLinuxProcess" targetRef="afterOsProcessComponent"/>
 
-        <scriptTask id="afterOsProcessComponent" name="After migration component"
-                    scriptFormat="groovy">
-            <script>out:println "After migration component"</script>
-        </scriptTask>
+        <serviceTask id="afterOsProcessComponent" name="After migration component"
+                     activiti:expression="#{afterProcess.execute(execution)}"/>
         <sequenceFlow sourceRef="afterOsProcessComponent" targetRef="migrationEnd"/>
 
         <endEvent id="migrationEnd" name="End of the migration process"/>
