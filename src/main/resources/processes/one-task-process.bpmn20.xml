@@ -33,7 +33,11 @@
         <scriptTask id="scriptTask" name="Script Task" scriptFormat="groovy">
             <script>out:println "This is my script task. Printing variable " + var1;</script>
         </scriptTask>
-        <sequenceFlow id="flow2" sourceRef="scriptTask" targetRef="theEnd"/>
+        <sequenceFlow id="flow2" sourceRef="scriptTask" targetRef="ruleTest"/>
+
+        <businessRuleTask id="ruleTest" activiti:ruleVariablesInput="${test}"
+                          activiti:rules="test, test2"/>
+        <sequenceFlow sourceRef="ruleTest" targetRef="theEnd"/>
 
         <endEvent id="theEnd" name="The end of the process"/>
     </process>

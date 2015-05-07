@@ -1,0 +1,17 @@
+package com.jinloes.activiti_test;
+
+import com.jinloes.activiti_test.Test;
+
+rule "test"
+    when
+        i : Test(foo == true);
+    then
+        System.out.println("True");
+end
+
+rule "test2"
+    when
+        i : Test(foo == false);
+    then
+        System.out.println("False");
+end
